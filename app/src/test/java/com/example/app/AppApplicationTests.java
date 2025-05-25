@@ -21,28 +21,28 @@ class AppApplicationTests {
     @Autowired
     private AuthorRepository authorRepository;
 
-
     @Test
     void contextLoads() {
-        Author author = new Author(null, "Mike", "Mike", "Mike", new HashSet<>());
-        Book book = new Book(null, "Mike", "Mike", new HashSet<>());
+        Author author = new Author(null, "Mike", "Mike", "Mike");
+        Book book = new Book(null, "Genre", "Book", new HashSet<>());
 
-        bookRepository.save(book);
         authorRepository.save(author);
-
-        Author persistedAuthor = authorRepository.findById(author.getId()).orElseThrow();
-        Book persistedBook = bookRepository.findById(book.getId()).orElseThrow();
+        bookRepository.save(book);
 
         AuthorBook authorBook = new AuthorBook(
-                new AuthorBookId(persistedAuthor.getId(), persistedBook.getId()),
-                persistedAuthor,
-                persistedBook);
+                new AuthorBookId(author.getId(), book.getId()),
+                author,
+                book);
 
-        persistedAuthor.addAuthorBook(authorBook);
+        book.addAuthorBook(authorBook);
+        authorRepository.save(author);
 
-        authorRepository.save(persistedAuthor);
+        assertThat(bookRepository.findAll().get(0).getAuthors()).isNotEmpty();
 
-        assertThat(persistedAuthor.getBooks().size()).isEqualTo(1);
-        assertThat(persistedBook.getAuthors().size()).isEqualTo(1);
+        bookRepository.delete(book);
+
+        assertThat(bookRepository.findAll()).isEmpty();
+        assertThat(authorRepository.findAll()).isNotEmpty();
     }
+
 }
