@@ -5,6 +5,7 @@ import com.example.app.model.User;
 import com.example.app.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ public class UserController {
     private final AuthService authService;
 
     @GetMapping("/current")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<UserResponse> getUserData() {
         final User user = authService.getCurrentUser();
         final UserResponse userData = new UserResponse(user.getUsername(), user.getRole().name());
