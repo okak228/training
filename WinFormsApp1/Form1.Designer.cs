@@ -37,7 +37,17 @@
             button4 = new Button();
             label1 = new Label();
             label2 = new Label();
+            groupBox1 = new GroupBox();
+            AddButton = new Button();
+            label5 = new Label();
+            AddPageCountTextBox = new TextBox();
+            label4 = new Label();
+            AddYearTextBox = new TextBox();
+            label3 = new Label();
+            AddAuthorNameTextBox = new TextBox();
+            ReloadButton = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // LoadButton
@@ -121,11 +131,97 @@
             label2.TabIndex = 10;
             label2.Text = "Автор";
             // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(AddButton);
+            groupBox1.Controls.Add(label5);
+            groupBox1.Controls.Add(AddPageCountTextBox);
+            groupBox1.Controls.Add(label4);
+            groupBox1.Controls.Add(AddYearTextBox);
+            groupBox1.Controls.Add(label3);
+            groupBox1.Controls.Add(AddAuthorNameTextBox);
+            groupBox1.Location = new Point(342, 12);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(200, 155);
+            groupBox1.TabIndex = 11;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Форма добавления книги";
+            // 
+            // AddButton
+            // 
+            AddButton.Location = new Point(119, 126);
+            AddButton.Name = "AddButton";
+            AddButton.Size = new Size(75, 23);
+            AddButton.TabIndex = 6;
+            AddButton.Text = "Создать";
+            AddButton.UseVisualStyleBackColor = true;
+            AddButton.Click += button1_Click;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(6, 83);
+            label5.Name = "label5";
+            label5.Size = new Size(63, 15);
+            label5.TabIndex = 5;
+            label5.Text = "Страницы";
+            // 
+            // AddPageCountTextBox
+            // 
+            AddPageCountTextBox.Location = new Point(81, 80);
+            AddPageCountTextBox.Name = "AddPageCountTextBox";
+            AddPageCountTextBox.Size = new Size(113, 23);
+            AddPageCountTextBox.TabIndex = 4;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(6, 54);
+            label4.Name = "label4";
+            label4.Size = new Size(26, 15);
+            label4.TabIndex = 3;
+            label4.Text = "Год";
+            // 
+            // AddYearTextBox
+            // 
+            AddYearTextBox.Location = new Point(52, 51);
+            AddYearTextBox.Name = "AddYearTextBox";
+            AddYearTextBox.Size = new Size(142, 23);
+            AddYearTextBox.TabIndex = 2;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(6, 25);
+            label3.Name = "label3";
+            label3.Size = new Size(40, 15);
+            label3.TabIndex = 1;
+            label3.Text = "Автор";
+            // 
+            // AddAuthorNameTextBox
+            // 
+            AddAuthorNameTextBox.Location = new Point(52, 22);
+            AddAuthorNameTextBox.Name = "AddAuthorNameTextBox";
+            AddAuthorNameTextBox.Size = new Size(142, 23);
+            AddAuthorNameTextBox.TabIndex = 0;
+            // 
+            // ReloadButton
+            // 
+            ReloadButton.Location = new Point(12, 396);
+            ReloadButton.Name = "ReloadButton";
+            ReloadButton.Size = new Size(100, 23);
+            ReloadButton.TabIndex = 12;
+            ReloadButton.Text = "Перезагрузить";
+            ReloadButton.UseVisualStyleBackColor = true;
+            ReloadButton.Click += ReloadButton_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(554, 395);
+            ClientSize = new Size(554, 420);
+            Controls.Add(ReloadButton);
+            Controls.Add(groupBox1);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(button4);
@@ -138,6 +234,8 @@
             Name = "Form1";
             Text = "Форма";
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -152,5 +250,14 @@
         private Button button4;
         private Label label1;
         private Label label2;
+        private GroupBox groupBox1;
+        private TextBox AddAuthorNameTextBox;
+        private Label label4;
+        private TextBox AddYearTextBox;
+        private Label label3;
+        private Label label5;
+        private TextBox AddPageCountTextBox;
+        private Button AddButton;
+        private Button ReloadButton;
     }
 }

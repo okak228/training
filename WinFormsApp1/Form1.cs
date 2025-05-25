@@ -29,9 +29,8 @@ namespace WinFormsApp1
 
                     books.AddRange(data);
 
-                    dataGridView1.DataSource = null;
-                    dataGridView1.DataSource = books;
-                    dataGridView1.Columns.RemoveAt(dataGridView1.Columns.Count - 1);
+                    ReloadDataGrip(books);
+
                     MessageBox.Show($"Загружено: {data.Count} записей");
                 }
                 catch (Exception ex)
@@ -75,8 +74,7 @@ namespace WinFormsApp1
                     .Where(b => b.Year == year)
                     .ToList();
 
-            dataGridView1.DataSource = result;
-            dataGridView1.Columns.RemoveAt(dataGridView1.Columns.Count - 1);
+            ReloadDataGrip(result);
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -91,14 +89,62 @@ namespace WinFormsApp1
                         .FirstOrDefault()
                         ?? throw new Exception("Не найдена книга автора");
 
-                dataGridView1.DataSource = new List<Book> { result };
-                dataGridView1.Columns.RemoveAt(dataGridView1.Columns.Count - 1);
+                ReloadDataGrip([result]);
             }
             catch (Exception ex)
             {
                 dataGridView1.DataSource = null;
                 MessageBox.Show($"Ошибка сохранения: {ex.Message}");
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var authorName = AddAuthorNameTextBox.Text;
+
+                if (!int.TryParse(AddYearTextBox.Text, out var year))
+                {
+                    throw new Exception("Ошибка извлечения года.");
+                }
+
+                if (!int.TryParse(AddPageCountTextBox.Text, out var pageCount))
+                {
+                    throw new Exception("Ошибка извлечения количества страниц.");
+                }
+
+                var book = new Book
+                {
+                    Id = Guid.NewGuid(),
+                    AuthorName = authorName,
+                    Year = year,
+                    PageCount = pageCount
+                };
+
+                books.Add(book);
+
+                ReloadDataGrip(books);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка сохранения: {ex.Message}");
+                return;
+            }
+
+            MessageBox.Show("Книга добавлена.");
+        }
+
+        private void ReloadDataGrip(List<Book> books)
+        {
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = books;
+            dataGridView1.Columns.RemoveAt(dataGridView1.Columns.Count - 1);
+        }
+
+        private void ReloadButton_Click(object sender, EventArgs e)
+        {
+            ReloadDataGrip(books);
         }
     }
 }
