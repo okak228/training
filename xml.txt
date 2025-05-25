@@ -1,0 +1,32 @@
+        private void ImportButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new()
+            {
+                Filter = "XML файлы (*.xml)|*.xml",
+                Title = "Выберите файл"
+            };
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string selectedFilePath = openFileDialog.FileName;
+                XmlSerializer serializer = new(typeof(List<Book>));
+                using FileStream fs = new(selectedFilePath, FileMode.Open);
+                books = (List<Book>)serializer.Deserialize(fs)!;
+                RefreshDataGrid();
+            }
+        }
+
+        private void ExportButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new()
+            {
+                Filter = "XML файлы (*.xml)|*.xml",
+                Title = "Выберите файл"
+            };
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string selectedFilePath = saveFileDialog.FileName;
+                XmlSerializer serializer = new(typeof(List<Book>));
+                using FileStream fs = new(selectedFilePath, FileMode.Create);
+                serializer.Serialize(fs, books);
+            }
+        }
