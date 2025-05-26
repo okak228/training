@@ -1,4 +1,4 @@
-﻿Создать кольцевой список, реализовать функцию добавления нового элемента в кольцевой список (вставка в середину с сохранением упорядоченности элементов), реализовать функцию вывода списка на экран.
+Создать кольцевой список, реализовать функцию добавления нового элемента в кольцевой список (вставка в середину с сохранением упорядоченности элементов), реализовать функцию вывода списка на экран.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -385,254 +385,146 @@ class Program
 
 C#. Создать хеш-таблицу по методу цепочек. В качестве цепочки использовать стандартную коллекцию. Реализовать функцию перехэширования.
 
-using System;
-using System.Collections.Generic;
-
-/// <summary>
-/// Хеш-таблица, реализующая метод цепочек для разрешения коллизий
-/// </summary>
-/// <typeparam name="TKey">Тип ключа</typeparam>
-/// <typeparam name="TValue">Тип значения</typeparam>
-public class ChainHashTable<TKey, TValue>
+public class HashTable
 {
-    // Начальная емкость хеш-таблицы по умолчанию
-    private const int DefaultCapacity = 16;
-    // Пороговое значение коэффициента загрузки для активации перехэширования
+    private LinkedList<KeyValuePair<string, int>>[] buckets;
+    private int count;
     private const double LoadFactorThreshold = 0.75;
 
-    // Массив корзин (бакетов), каждая корзина - связный список пар ключ-значение
-    private LinkedList<KeyValuePair<TKey, TValue>>[] buckets;
-    // Количество элементов в таблице
-    public int Count { get; private set; }
-
-    /// <summary>
-    /// Конструктор по умолчанию (с начальной емкостью по умолчанию)
-    /// </summary>
-    public ChainHashTable() : this(DefaultCapacity) { }
-
-    /// <summary>
-    /// Конструктор с заданной начальной емкостью
-    /// </summary>
-    /// <param name="capacity">Начальная емкость таблицы</param>
-    public ChainHashTable(int capacity)
+    public HashTable(int capacity = 8)
     {
-        // Инициализируем массив корзин заданного размера
-        buckets = new LinkedList<KeyValuePair<TKey, TValue>>[capacity];
+        buckets = new LinkedList<KeyValuePair<string, int>>[capacity];
+        for (int i = 0; i < capacity; i++)
+        {
+            buckets[i] = new LinkedList<KeyValuePair<string, int>>();
+        }
+        count = 0;
     }
 
-    /// <summary>
-    /// Вычисляет индекс корзины для заданного ключа
-    /// </summary>
-    /// <param name="key">Ключ</param>
-    /// <returns>Индекс корзины</returns>
-    private int GetBucketIndex(TKey key)
+    private int GetIndex(string key)
     {
-        // Получаем хеш-код ключа и гарантируем, что он положительный
-        int hashCode = key.GetHashCode() & 0x7FFFFFFF;
-        // Вычисляем индекс корзины как остаток от деления на количество корзин
-        return hashCode % buckets.Length;
+        int hash = key.GetHashCode();
+        return Math.Abs(hash) % buckets.Length;
     }
 
-    /// <summary>
-    /// Добавляет пару ключ-значение в хеш-таблицу
-    /// </summary>
-    /// <param name="key">Ключ</param>
-    /// <param name="value">Значение</param>
-    /// <exception cref="ArgumentNullException">Если ключ null</exception>
-    /// <exception cref="ArgumentException">Если ключ уже существует</exception>
-    public void Add(TKey key, TValue value)
+    public void Add(string key, int value)
     {
-        if (key == null)
-            throw new ArgumentNullException(nameof(key));
+        int index = GetIndex(key);
+        var chain = buckets[index];
 
-        // Проверяем необходимость перехэширования
-        if ((double)Count / buckets.Length > LoadFactorThreshold)
-        {
-            Rehash();
-        }
-
-        // Получаем индекс корзины для ключа
-        int bucketIndex = GetBucketIndex(key);
-
-        // Если корзина пустая, создаем новый связный список
-        if (buckets[bucketIndex] == null)
-        {
-            buckets[bucketIndex] = new LinkedList<KeyValuePair<TKey, TValue>>();
-        }
-
-        var chain = buckets[bucketIndex];
-
-        // Проверяем, не существует ли уже такой ключ в цепочке
         foreach (var pair in chain)
         {
-            if (pair.Key.Equals(key))
+            if (pair.Key == key)
             {
-                throw new ArgumentException("Элемент с таким ключом уже существует");
+                // Обновляем значение
+                chain.Remove(pair);
+                chain.AddLast(new KeyValuePair<string, int>(key, value));
+                return;
             }
         }
 
-        // Добавляем новую пару ключ-значение в конец цепочки
-        chain.AddLast(new KeyValuePair<TKey, TValue>(key, value));
-        Count++;
+        chain.AddLast(new KeyValuePair<string, int>(key, value));
+        count++;
+
+        if ((double)count / buckets.Length > LoadFactorThreshold)
+        {
+            Console.WriteLine($"\n>> Rehashing triggered after inserting '{key}'...");
+            Console.WriteLine(">>> Old hash table:");
+            Print();
+            Rehash();
+            Console.WriteLine(">>> New hash table:");
+            Print();
+        }
     }
 
-    /// <summary>
-    /// Пытается получить значение по ключу
-    /// </summary>
-    /// <param name="key">Ключ для поиска</param>
-    /// <param name="value">Найденное значение (если ключ существует)</param>
-    /// <returns>True, если ключ найден, иначе False</returns>
-    /// <exception cref="ArgumentNullException">Если ключ null</exception>
-    public bool TryGetValue(TKey key, out TValue value)
+    public bool TryGet(string key, out int value)
     {
-        if (key == null)
-            throw new ArgumentNullException(nameof(key));
+        int index = GetIndex(key);
+        var chain = buckets[index];
 
-        int bucketIndex = GetBucketIndex(key);
-        var chain = buckets[bucketIndex];
+        foreach (var pair in chain)
+        {
+            if (pair.Key == key)
+            {
+                value = pair.Value;
+                return true;
+            }
+        }
 
-        // Если цепочка существует, ищем в ней ключ
-        if (chain != null)
+        value = default;
+        return false;
+    }
+
+    public bool Remove(string key)
+    {
+        int index = GetIndex(key);
+        var chain = buckets[index];
+
+        foreach (var pair in chain)
+        {
+            if (pair.Key == key)
+            {
+                chain.Remove(pair);
+                count--;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void Rehash()
+    {
+        var oldBuckets = buckets;
+        int newCapacity = buckets.Length * 2;
+        buckets = new LinkedList<KeyValuePair<string, int>>[newCapacity];
+
+        for (int i = 0; i < newCapacity; i++)
+        {
+            buckets[i] = new LinkedList<KeyValuePair<string, int>>();
+        }
+
+        count = 0;
+
+        foreach (var chain in oldBuckets)
         {
             foreach (var pair in chain)
             {
-                if (pair.Key.Equals(key))
-                {
-                    value = pair.Value;
-                    return true;
-                }
+                Add(pair.Key, pair.Value);
             }
         }
-
-        // Ключ не найден
-        value = default(TValue);
-        return false;
     }
 
-    /// <summary>
-    /// Удаляет элемент с указанным ключом
-    /// </summary>
-    /// <param name="key">Ключ для удаления</param>
-    /// <returns>True, если элемент был удален, иначе False</returns>
-    /// <exception cref="ArgumentNullException">Если ключ null</exception>
-    public bool Remove(TKey key)
+    public void Print()
     {
-        if (key == null)
-            throw new ArgumentNullException(nameof(key));
-
-        int bucketIndex = GetBucketIndex(key);
-        var chain = buckets[bucketIndex];
-
-        // Если цепочка существует, ищем в ней ключ
-        if (chain != null)
-        {
-            var node = chain.First;
-            while (node != null)
-            {
-                if (node.Value.Key.Equals(key))
-                {
-                    // Удаляем узел с найденным ключом
-                    chain.Remove(node);
-                    Count--;
-                    return true;
-                }
-                node = node.Next;
-            }
-        }
-
-        // Ключ не найден
-        return false;
-    }
-
-    /// <summary>
-    /// Перехэширование таблицы (увеличение размера и перераспределение элементов)
-    /// </summary>
-    private void Rehash()
-    {
-        // Увеличиваем емкость в 2 раза
-        int newCapacity = buckets.Length * 2;
-        var newBuckets = new LinkedList<KeyValuePair<TKey, TValue>>[newCapacity];
-
-        // Перебираем все существующие цепочки
-        foreach (var chain in buckets)
-        {
-            if (chain != null)
-            {
-                // Перебираем все элементы в цепочке
-                foreach (var pair in chain)
-                {
-                    // Вычисляем новый индекс корзины для элемента
-                    int newBucketIndex = pair.Key.GetHashCode() & 0x7FFFFFFF % newCapacity;
-
-                    // Если новая корзина пустая, создаем связный список
-                    if (newBuckets[newBucketIndex] == null)
-                    {
-                        newBuckets[newBucketIndex] = new LinkedList<KeyValuePair<TKey, TValue>>();
-                    }
-
-                    // Добавляем элемент в новую корзину
-                    newBuckets[newBucketIndex].AddLast(pair);
-                }
-            }
-        }
-
-        // Заменяем старый массив корзин новым
-        buckets = newBuckets;
-    }
-
-    /// <summary>
-    /// Выводит статистику по хеш-таблице
-    /// </summary>
-    public void PrintStats()
-    {
-        Console.WriteLine($"Всего элементов: {Count}");
-        Console.WriteLine($"Количество корзин: {buckets.Length}");
-        Console.WriteLine("Распределение элементов по корзинам:");
-
-        // Выводим количество элементов в каждой корзине
         for (int i = 0; i < buckets.Length; i++)
         {
-            int itemsInBucket = buckets[i]?.Count ?? 0;
-            Console.WriteLine($"Корзина {i}: {itemsInBucket} элементов");
+            Console.Write($"[{i}]: ");
+            foreach (var pair in buckets[i])
+            {
+                Console.Write($"({pair.Key}:{pair.Value}) -> ");
+            }
+            Console.WriteLine("null");
         }
     }
 }
-
-// Пример использования хеш-таблицы
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Создаем новую хеш-таблицу
-        var hashTable = new ChainHashTable<string, int>();
+        var table = new HashTable();
 
-        // Добавляем элементы
-        hashTable.Add("one", 1);
-        hashTable.Add("two", 2);
-        hashTable.Add("three", 3);
-        hashTable.Add("four", 4);
-        hashTable.Add("five", 5);
+        table.Add("apple", 10);
+        table.Add("banana", 20);
+        table.Add("orange", 30);
+        table.Add("grape", 40);
+        table.Add("peach", 50);
+        table.Add("melon", 60);
+        table.Add("kiwi", 70);
+        table.Add("cherry", 80); // Триггерит перехеширование
 
-        // Пытаемся получить значение по ключу
-        if (hashTable.TryGetValue("three", out int value))
-        {
-            Console.WriteLine($"Найдено значение для 'three': {value}");
-        }
-
-        // Удаляем элемент
-        hashTable.Remove("two");
-
-        // Выводим статистику
-        hashTable.PrintStats();
-
-        // Добавляем больше элементов для демонстрации перехэширования
-        for (int i = 6; i <= 20; i++)
-        {
-            hashTable.Add($"key_{i}", i);
-        }
-
-        Console.WriteLine("\nПосле перехэширования:");
-        hashTable.PrintStats();
+        Console.WriteLine("\n>>> Final hash table:");
+        table.Print();
     }
 }
 
@@ -1094,114 +986,111 @@ using System;
 
 class HashTable
 {
-    private string[] table;       // Массив для хранения элементов
-    private int size;             // Размер таблицы
-    private int count;            // Текущее количество элементов
-    private const string DELETED = "<deleted>"; // Маркер удалённого элемента
-
-    public HashTable(int capacity)
+    private struct Entry
     {
-        size = capacity;
-        table = new string[size];
-        count = 0;
+        public string Key;
+        public int Value;
+        public bool IsOccupied;
+        public bool IsDeleted;
     }
 
-    // Первая хеш-функция (основная)
-    private int Hash1(string key)
+    private Entry[] table;
+    private int size;
+
+    public HashTable(int capacity = 11)
+    {
+        size = capacity;
+        table = new Entry[size];
+    }
+
+    private int PrimaryHash(string key)
     {
         return Math.Abs(key.GetHashCode()) % size;
     }
 
-    // Вторая хеш-функция (используется при коллизии)
-    private int Hash2(string key)
+    private int SecondaryHash(string key)
     {
-        // Простое число меньше размера таблицы. Гарантирует, что шаг смещения ≠ 0
         return 1 + (Math.Abs(key.GetHashCode()) % (size - 1));
     }
 
-    // Метод вставки ключа
-    public void Insert(string key)
+    private int FindIndex(string key, bool forInsert)
     {
-        if (count >= size)
-        {
-            Console.WriteLine("Хеш-таблица переполнена.");
-            return;
-        }
+        int h1 = PrimaryHash(key);
+        int h2 = SecondaryHash(key);
 
-        int h1 = Hash1(key);
-        int h2 = Hash2(key);
-        int index;
-
-        // Пробуем найти свободную ячейку с помощью двойного хеширования
         for (int i = 0; i < size; i++)
         {
-            index = (h1 + i * h2) % size;
+            int index = (h1 + i * h2) % size;
 
-            // Вставляем элемент, если ячейка пустая или удалённая
-            if (table[index] == null || table[index] == DELETED)
+            if (forInsert)
             {
-                table[index] = key;
-                count++;
-                return;
+                if (!table[index].IsOccupied  table[index].IsDeleted  table[index].Key == key)
+                    return index;
+            }
+            else
+            {
+                if (!table[index].IsOccupied)
+                    return -1;
+                if (!table[index].IsDeleted && table[index].Key == key)
+                    return index;
             }
         }
 
-        Console.WriteLine("Не удалось вставить ключ: " + key);
+        return -1; // таблица заполнена или не найдено
     }
 
-    // Метод поиска элемента
-    public bool Search(string key)
+    public void Add(string key, int value)
     {
-        int h1 = Hash1(key);
-        int h2 = Hash2(key);
-        int index;
-
-        // Пробуем найти ключ
-        for (int i = 0; i < size; i++)
+        int index = FindIndex(key, true);
+        if (index == -1)
         {
-            index = (h1 + i * h2) % size;
+            Console.WriteLine($"Таблица переполнена. Невозможно вставить ключ '{key}'.");
+            return;
+        }
 
-            if (table[index] == null)
-                return false; // если встретили null, значит ключа нет
+        table[index].Key = key;
+        table[index].Value = value;
+        table[index].IsOccupied = true;
+        table[index].IsDeleted = false;
+    }
 
-            if (table[index] != DELETED && table[index] == key)
-                return true;
+    public bool TryGet(string key, out int value)
+    {
+        int index = FindIndex(key, false);
+        if (index != -1)
+        {
+            value = table[index].Value;
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+
+    public bool Remove(string key)
+    {
+        int index = FindIndex(key, false);
+        if (index != -1)
+        {
+            table[index].IsDeleted = true;
+            return true;
         }
 
         return false;
     }
 
-    // Метод удаления элемента
-    public void Delete(string key)
-    {
-        int h1 = Hash1(key);
-        int h2 = Hash2(key);
-        int index;
-
-        // Пробуем найти и удалить ключ
-        for (int i = 0; i < size; i++)
-        {
-            index = (h1 + i * h2) % size;
-
-            if (table[index] == null)
-                return; // если null — элемент не найден
-
-            if (table[index] != DELETED && table[index] == key)
-            {
-                table[index] = DELETED;
-                count--;
-                return;
-            }
-        }
-    }
-
-    // Печать всей таблицы
     public void Print()
     {
-        Console.WriteLine("Хеш-таблица:");
+        Console.WriteLine("Состояние хеш-таблицы:");
         for (int i = 0; i < size; i++)
         {
-            Console.WriteLine($"[{i}] => {table[i]}");
+            var entry = table[i];
+            if (entry.IsOccupied && !entry.IsDeleted)
+                Console.WriteLine($"[{i}] {entry.Key} → {entry.Value}");
+            else if (entry.IsDeleted)
+                Console.WriteLine($"[{i}] <удалено>");
+            else
+                Console.WriteLine($"[{i}] пусто");
         }
     }
 }
@@ -1210,27 +1099,23 @@ class Program
 {
     static void Main()
     {
-        var table = new HashTable(11); // Инициализация таблицы размером 11 (простое число)
+        var table = new HashTable();
 
-        // Вставка элементов
-        table.Insert("apple");
-        table.Insert("banana");
-        table.Insert("orange");
-        table.Insert("grape");
-        table.Insert("melon");
+        table.Add("apple", 1);
+        table.Add("banana", 2);
+        table.Add("orange", 3);
+        table.Add("grape", 4);
 
         table.Print();
 
-        // Удаление элемента
-        Console.WriteLine("\nУдаляем 'banana':");
-        table.Delete("banana");
+        Console.WriteLine();
+        if (table.TryGet("banana", out int value))
+            Console.WriteLine($"banana: {value}");
+
+        table.Remove("banana");
+
+        Console.WriteLine("\nПосле удаления 'banana':");
         table.Print();
-
-        // Поиск элементов
-        Console.WriteLine($"\nПоиск 'orange': {table.Search("orange")}");
-        Console.WriteLine($"Поиск 'banana': {table.Search("banana")}");
-
-        Console.ReadLine();
     }
 }
 
@@ -2760,5 +2645,3 @@ class Program
         }
     }
 }
-
-
