@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+#pragma execution_character_set("utf-8")
+
+
+
+typedef struct Node {
+    int value;
+    struct Node* next;
+} Node;
+
+
+Node* insertSorted(Node* headRef, int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->value = data;
+
+    if (headRef == NULL) {
+        newNode->next = newNode;
+        return newNode;
+    }
+
+    Node* current = headRef;
+
+    do {
+        if (data >= current->value && data <= current->next->value) {
+            break;
+        }
+
+        if (current->value > current->next->value) {
+            if (data >= current->value || data <= current->next->value) {
+                break;
+            }
+        }
+
+        current = current->next;
+    } while (current != headRef);
+    newNode->next = current->next;
+    current->next = newNode;
+    if (data < headRef->value) {
+        return newNode;
+    }
+
+    return headRef;
+}
+
+
+
+void printList(Node* head) {
+    if (head == NULL) {
+        printf("Список пуст\n");
+        return;
+    }
+
+    Node* current = head;
+    printf("Кольцевой список: ");
+
+    do {
+        printf("%d ", current->value);
+        current = current->next;
+    } while (current != head);
+
+    printf("\n");
+}
+
+
+int main() {
+    SetConsoleOutputCP(65001);
+    Node* head = NULL;
+
+    head = insertSorted(head, 5);
+    head = insertSorted(head, 1);
+    head = insertSorted(head, 0);
+    head = insertSorted(head, 3);
+    head = insertSorted(head, 7);
+
+    printList(head);
+}
+

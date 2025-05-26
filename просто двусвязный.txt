@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+#pragma execution_character_set("utf-8")
+#define _CRT_SECURE_NO_WARNINGS
+
+typedef struct Node {
+	int data;
+	struct Node* next;
+	struct Node* prev;
+}Node;
+
+
+Node* createNode(int data) {
+	Node* node = (Node*)malloc(sizeof(Node));
+	node->next = NULL;
+	node->data = data;
+	node->prev = NULL;
+	return node;
+}
+
+Node* insert(Node* head, int data) {
+	Node* new= createNode(data);
+
+	if (head == NULL) {
+		head = new;
+		return head;
+	}
+
+	Node* cur = head;
+	Node* prev = NULL;
+
+	while (cur != NULL && cur->data < new->data) {
+		prev = cur;
+		cur = cur->next;
+	}
+
+	if (prev == NULL) {
+		new->next = head;
+		head->prev = new;
+		head = new;
+		return head;
+	}
+	else {
+		prev->next = new;
+		new->prev = prev;
+		new->next = cur;
+		if (cur != NULL) {
+			cur->prev = new;
+		}
+		return head;
+	}
+}
+
+void printList(Node* head) {
+	if (head == NULL) {
+		printf("Список пуст");
+		return;
+	}
+	Node* cur = head;
+	do {
+		printf("%d", cur->data);
+		cur = cur->next;
+	} while (cur!= NULL);
+}
+
+
+int main() {
+	SetConsoleOutputCP(CP_UTF8);
+
+	Node* head = NULL;
+	int x;
+	int number;
+
+	while (1) {
+		printf("\nВведите команду:\n1 - добавить в список\n2 - вывести список\n3 - выход\n");
+		scanf_s("%d", &x);
+
+		if (x == 1) {
+			printf("Введите число: ");
+			scanf_s("%d",&number);
+			head = insert(head, number);
+		}
+		else if (x == 2) {
+			printList(head);
+		}
+		else if (x == 3) {
+			break;
+		}
+		else {
+			printf("Неверная команда. Повторите ввод.\n");
+		}
+	}
+
+	return 0;
+}

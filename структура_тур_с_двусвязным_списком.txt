@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+#pragma execution_character_set("utf-8")
+
+typedef struct Tour {
+	int id;
+	char name[50];
+	char country[50];
+	int count;
+	char snp[100];
+} Tour;
+
+typedef struct Node {
+	Tour data;
+	struct Node* next;
+	struct Node* prev;
+} Node;
+
+
+Node* insertSorted(Node* head, Tour t) {
+	Node* newElement = (Node*)malloc(sizeof(Node));
+	newElement->data = t;
+	newElement->next = NULL;
+	newElement->prev = NULL;
+
+	if (head == NULL) {
+		head = newElement;
+		return head;
+	}
+
+	Node* cur = head;
+	Node* prev = NULL;
+	while(cur!=NULL && cur->data.id < t.id){
+		prev = cur;
+		cur = cur->next;
+	}
+	if (prev==NULL) {
+		newElement->next = head;
+		head->prev = newElement;
+		return newElement;
+	}
+	else {
+		newElement->next = cur;
+		newElement->prev = prev;
+		prev->next = newElement;
+		if (cur != NULL) {
+			cur->prev = newElement;
+		}
+		return head;
+	}
+}
+
+
+void printList(Node* head) {
+	if (head == NULL) {
+		printf("Список пуст\n");
+		return;
+	}
+	Node* cur = head;
+	do {
+		printf("[ %d | %s | %s | %d | %s ]",cur->data.id, cur->data.name, cur->data.country,cur->data.count,cur->data.snp);
+		cur = cur->next;
+	} while (cur != NULL);
+}
+
+int main() {
+	SetConsoleOutputCP(CP_UTF8);
+
+	Node* head = NULL;
+	int x;
+	int number;
+
+	while (1) {
+		printf("\nВведите команду:\n1 - добавить в список\n2 - вывести список\n3 - выход\n");
+		scanf_s("%d", &x);
+
+		if (x == 1) {
+			Tour t;
+			printf("Введите номер: ");
+			scanf_s("%d", &t.id);
+			printf("Введите Название: ");
+			scanf_s("%s", t.name, (unsigned)_countof(t.name));
+			printf("Введите Страну: ");
+			scanf_s("%s", t.country, (unsigned)_countof(t.country));
+			printf("Введите ФИО ответственного: ");
+			scanf_s(" %[^\n]", t.snp, (unsigned)_countof(t.snp));
+			printf("Введите кол-во: ");
+			scanf_s("%d", &t.count);
+			head = insertSorted(head, t);
+		}
+		else if (x == 2) {
+			printList(head);
+		}
+		else if (x == 3) {
+			break;
+		}
+		else {
+			printf("Неверная команда. Повторите ввод.\n");
+		}
+	}
+
+	return 0;
+}

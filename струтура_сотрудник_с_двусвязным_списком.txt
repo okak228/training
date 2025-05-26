@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+#pragma execution_character_set("utf-8")
+#define _CRT_SECURE_NO_WARNINGS
+typedef struct Employe {
+	int number;
+	char surname[50];
+	char name[50];
+	char patronymic[50];
+	char post[50];
+}Employee;
+
+
+typedef struct Node {
+	Employee data;
+	struct Node* next;
+	struct Node* prev;
+}Node;
+
+Node* create_Node(Employee e) 
+{
+	Node* new = (Node*)malloc(sizeof(Node));
+	new->data = e;
+	new->next=NULL;
+	new->prev = NULL;
+	return new;
+}
+
+
+//метод взять с туров
+Node* insertSorted(Node* head,Employee e) {
+	Node* new = create_Node(e);
+	if (head == NULL) {
+		head = new;
+		return head;
+	}
+	Node* cur = head;
+	while (cur != NULL && cur->data.number < e.number) {
+		cur = cur->next;
+	}
+	if (cur == NULL) {
+		Node* last = head;
+		while (last->next != NULL) 
+		{
+			last = last->next;
+		}
+		last->next = new;
+		new->prev = last;
+		return head;
+	}
+	else if (cur == head) {
+		new->next = head;
+		(head)->prev = new;
+		head = new;
+		return new;
+	}
+	else {
+		Node* prev = cur->prev;
+		prev->next = new;
+		new->next = cur;
+		cur->prev = new;
+		new->prev = prev;
+		return head;
+	}
+}
+
+void printList(Node* head) {
+	if (head == NULL) {
+		printf("Список пуст\n");
+		return;
+	}
+
+	Node* cur = head;
+	printf("Список сотрудников:\n");
+	while (cur != NULL) {
+		printf("№%d | %s %s %s | Должность: %s\n",
+			cur->data.number,
+			cur->data.surname,
+			cur->data.name,
+			cur->data.patronymic,
+			cur->data.post);
+		cur = cur->next;
+	}
+
+	printf("\n");
+}
+
+
+int main() {
+	SetConsoleOutputCP(CP_UTF8);
+
+	Node* head = NULL;
+	int x;
+	int number;
+
+	while (1) {
+		printf("\nВведите команду:\n1 - добавить в список\n2 - вывести список\n3 - выход\n");
+		scanf_s("%d", &x);
+
+		if (x == 1) {
+			Employee e;
+			printf("Введите номер: ");
+			scanf_s("%d", &e.number);
+			printf("Введите фамилию: ");
+			scanf_s("%s", &e.surname, (unsigned)_countof(e.surname));
+			printf("Введите имя: ");
+			scanf_s("%s", &e.name, (unsigned)_countof(e.name));
+			printf("Введите отчество: ");
+			scanf_s("%s", &e.patronymic, (unsigned)_countof(e.patronymic));
+			printf("Введите должность: ");
+			scanf_s("%s", &e.post, (unsigned)_countof(e.post));
+			head = insertSorted(head, e);
+		}
+		else if (x == 2) {
+			printList(head);
+		}
+		else if (x == 3) {
+			break;
+		}
+		else {
+			printf("Неверная команда. Повторите ввод.\n");
+		}
+	}
+
+	return 0;
+}
