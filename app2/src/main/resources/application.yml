@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/app
+    driverClassName: org.postgresql.Driver
+#    url: jdbc:h2:file:./testdb
+#    driverClassName: org.h2.Driver
+    username: new_admin
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-console
+
+jwt:
+  secret-key: 2e292e323124377c78255f363165246b6c7d684a7379445f5c3b713962
+
+#  CREATE ROLE new_admin WITH
+#  LOGIN
+#  SUPERUSER
+#  CREATEDB
+#  CREATEROLE
+#  INHERIT
+#  REPLICATION
+#  CONNECTION LIMIT -1
+#  PASSWORD 'password';
+#
+#  SELECT rolname, rolsuper FROM pg_roles WHERE rolname = 'new_admin';
