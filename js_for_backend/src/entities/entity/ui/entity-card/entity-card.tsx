@@ -19,7 +19,6 @@ export const EntityCard = ({ entity, onDelete }: EntityCardProps) => {
     <Card>
       <CardContent>
         <Typography>{entity.name}</Typography>
-        <Typography>{entity.user?.login}</Typography>
       </CardContent>
       <CardActions>
         <Link to={`/entity/${entity.id}`}>

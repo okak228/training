@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { useAuthStore } from 'entities/user/store';
 
 export const SignInForm = () => {
-  const { setCurrentUser } = useAuthStore();
+  const { setStorageUser } = useAuthStore();
 
   const {
     control,
@@ -18,7 +18,7 @@ export const SignInForm = () => {
 
   const handleFormSubmit = async (values) => {
     const user = await signIn(values);
-    setCurrentUser(user);
+    setStorageUser(user);
   };
 
   return (

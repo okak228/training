@@ -15,10 +15,10 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Получаем токен из хранилища (localStorage, cookie, store и т.д.)
-    const token = useAuthStore.getState().user.accessToken;
+    const { user } = useAuthStore.getState();
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (user?.accessToken) {
+      config.headers.Authorization = `Bearer ${user.accessToken}`;
     }
 
     return config;

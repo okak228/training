@@ -2,3 +2,6 @@
 
 npm start
 npm run server
+
+
+Ctrl + , workbench.tree.indent: 20
