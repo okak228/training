@@ -7,7 +7,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => {
       return {
         user: null,
-        setCurrentUser: (user) => set({ user }),
+        setStorageUser: (user) => set({ user }),
       };
     },
     { name: 'user' },

@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -21,8 +20,6 @@ public class UpdateNewEntityRq {
     private LocalDate date;
     @NotNull
     private LocalDateTime dateTime;
-    @NotNull
-    private OffsetDateTime offsetDateTime;
     @NotNull
     private UUID userId;
 }

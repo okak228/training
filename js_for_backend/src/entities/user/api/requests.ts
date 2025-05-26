@@ -1,4 +1,4 @@
-import { CurrentUser, User, UserRole } from '../types';
+import { StorageUser, User } from '../types';
 import api from 'app/api/api';
 
 interface UserParams {
@@ -16,24 +16,14 @@ export const getUsers = async () => {
   return users;
 };
 
-export const getUser = async () => {
-  const response = await api.get('/user/current');
-  const userRole: UserRole = await response.data;
-  return userRole ?? null;
-};
-
 export const createUser = async (params: UserParams) => {
-  const response = await api.post('/auth/sign-up', {
-    params,
-  });
+  const response = await api.post('/auth/sign-up', params);
   const user: MessageResponse = await response.data;
   return user;
 };
 
 export const signIn = async (params: UserParams) => {
-  const response = await api.post('/auth/sign-in', {
-    params,
-  });
-  const user: CurrentUser = await response.data;
+  const response = await api.post('/auth/sign-in', params);
+  const user: StorageUser = await response.data;
   return user;
 };

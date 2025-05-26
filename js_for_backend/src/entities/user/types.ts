@@ -4,18 +4,13 @@ export interface User {
   role: string;
 }
 
-export interface UserRole {
-  name: string;
-  role: string;
-}
-
-export interface CurrentUser {
+export interface StorageUser {
   name: string;
   role: string;
   accessToken: string;
 }
 
 export interface AuthState {
-  user: CurrentUser | null;
-  setCurrentUser: (user: CurrentUser | null) => void;
+  user: StorageUser | null;
+  setStorageUser: (user: StorageUser | null) => void;
 }

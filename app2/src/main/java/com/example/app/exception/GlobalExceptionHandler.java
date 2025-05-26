@@ -12,18 +12,21 @@ import org.springframework.web.server.ResponseStatusException;
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<MessageRs> handleResponseStatusException(ResponseStatusException exception) {
+        exception.printStackTrace();
         return ResponseEntity.status(exception.getStatusCode())
                 .body(new MessageRs(exception.getReason()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<MessageRs> handleAccessDeniedException(AccessDeniedException exception) {
+        exception.printStackTrace();
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new MessageRs(exception.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<MessageRs> handleUnknownException(Exception exception) {
+        exception.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new MessageRs(exception.getMessage()));
     }

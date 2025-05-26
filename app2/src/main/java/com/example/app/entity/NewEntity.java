@@ -14,7 +14,6 @@ import lombok.experimental.FieldNameConstants;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -31,7 +30,6 @@ public class NewEntity {
     private String description;
     private LocalDate date;
     private LocalDateTime dateTime;
-    private OffsetDateTime offsetDateTime;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

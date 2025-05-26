@@ -6,10 +6,10 @@ import { useAuthStore } from 'entities/user';
 import { Link } from 'react-router-dom';
 
 export const Header = () => {
-  const { user, setCurrentUser } = useAuthStore();
+  const { user, setStorageUser } = useAuthStore();
 
   const handleLogOutButtonClick = () => {
-    setCurrentUser(null);
+    setStorageUser(null);
   };
 
   return (
