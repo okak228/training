@@ -1,0 +1,76 @@
+c#
+using System.ComponentModel;
+using System.Xml.Linq;
+
+namespace WinFormsApp2.Model
+{
+    public class Book
+    {
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        [DisplayName("Имя автора")]
+        public string AuthorName { get; set; } = string.Empty;
+
+        [DisplayName("Год")]
+        public int Year { get; set; }
+
+        [DisplayName("Количество страниц")]
+        public int PageCount { get; set; }
+
+        public XElement ToXElement()
+        {
+            return new XElement(
+                "Book",
+                new XAttribute("Id", Id),
+                new XElement("AuthorName", AuthorName),
+                new XElement("Year", Year),
+                new XElement("PageCount", PageCount)
+            );
+        }
+
+        public static Book FromXElement(XElement xElement)
+        {
+            return new Book
+            {
+                Id = Guid.Parse(xElement.Attribute("Id")!.Value),
+                AuthorName = xElement.Element("AuthorName")!.Value,
+                Year = int.Parse(xElement.Element("Year")!.Value),
+                PageCount = int.Parse(xElement.Element("PageCount")!.Value),
+            };
+        }
+    }
+}
+
+
+
+
+
+
+
+ПРОДОЛЖЕНИЕ
+c#
+        private void ButtonImport_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var newBooks = XDocument
+                    .Load(openFileDialog.FileName)
+                    .Root?
+                    .Elements("Book")
+                    .Select(Book.FromXElement)
+                    .ToList();
+                books = newBooks ?? [];
+                RefreshDataGrid();
+            }
+        }
+
+        private void ButtonExport_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new();
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                XElement xElement = new("Books", books.Select((b) => b.ToXElement()));
+                new XDocument(xElement).Save(saveFileDialog.FileName);
+            }
+        }
